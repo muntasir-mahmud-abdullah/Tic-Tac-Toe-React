@@ -10,7 +10,7 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-function Board({isXnext,squares,onPlay}) {
+function Board({ isXnext, squares, onPlay }) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return;
@@ -54,33 +54,38 @@ function Board({isXnext,squares,onPlay}) {
 export default function Game() {
   const [isXnext, setIsXnext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentSquares = history[history.length - 1];
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquares = history[currentMove];
   function handlePlay(nextSquares) {
-    setHistory([...history,nextSquares]);
+    const nextHistory = [...history.slice(0,currentMove + 1),nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length -1);
     setIsXnext(!isXnext);
-    function jumpTo() {
-      //todo
-    }
   }
-      const moves = history.map((squares,move)=> {
-      let descriptions;
-      if(move>0) {
-        descriptions = "Go to move #" + move;
-      }
-      else {
-        descriptions = "Go to game start"
-      }
-      return (
-        <li key={move}> {descriptions} </li>
-      )
-    })
+      function jumpTo(nextMove) {
+      setCurrentMove(nextMove);
+      setIsXnext(nextMove % 2 === 0);
+    }
+  const moves = history.map((squares, move) => {
+    let descriptions;
+    if (move > 0) {
+      descriptions = "Go to move #" + move;
+    } else {
+      descriptions = "Go to game start";
+    }
+    return (
+      <li className="bg-gray-200 p-1 mb-1" key={move}>
+        <button onClick={() => jumpTo(move)}>{descriptions} </button>
+      </li>
+    );
+  });
   return (
-    <div className="">
-      <div className="">
+    <div className="flex justify-center gap-10 m-10">
+      <div className="flex flex-col justify-center gap-3">
         <Board isXnext={isXnext} squares={currentSquares} onPlay={handlePlay} />
       </div>
-      <div className="">
-        <ol> {moves}</ol>
+      <div className="border min-h-96 border-gray-400">
+        <ol className=""> {moves}</ol>
       </div>
     </div>
   );
